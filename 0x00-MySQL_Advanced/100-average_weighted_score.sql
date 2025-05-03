@@ -1,43 +1,25 @@
--- 100. Create the stored procedure 'ComputeAverageWeightedScoreForUser'
-
-DELIMITER $$
-
+-- Creates a stored procedure to compute and store the average weighted score for a student
+DELIMITER //
 CREATE PROCEDURE ComputeAverageWeightedScoreForUser(IN user_id INT)
 BEGIN
-    DECLARE weighted_sum FLOAT DEFAULT 0;
-    DECLARE total_weight INT DEFAULT 0;
-    DECLARE project_weight INT;
-    DECLARE project_score FLOAT;
-
-    -- Cursor to calculate the weighted sum and total weight for the user
-    DECLARE project_cursor CURSOR FOR 
-    SELECT p.weight, c.score
+    DECLARE total_weighted_score FLOAT;
+    DECLARE total_weight INT;
+    
+    -- Calculate the sum of (score * weight) for all projects by the user
+    SELECT SUM(c.score * p.weight) INTO total_weighted_score
     FROM corrections c
     JOIN projects p ON c.project_id = p.id
     WHERE c.user_id = user_id;
-
-    -- Open the cursor
-    OPEN project_cursor;
-
-    -- Fetch values from cursor and compute weighted sum and total weight
-    read_loop: LOOP
-        FETCH project_cursor INTO project_weight, project_score;
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-        SET weighted_sum = weighted_sum + (project_score * project_weight);
-        SET total_weight = total_weight + project_weight;
-    END LOOP;
-
-    -- Close the cursor
-    CLOSE project_cursor;
-
-    -- Calculate the weighted average and update the user's average_score
-    IF total_weight > 0 THEN
-        UPDATE users SET average_score = weighted_sum / total_weight WHERE id = user_id;
-    ELSE
-        UPDATE users SET average_score = 0 WHERE id = user_id;
-    END IF;
-END $$
-
+    
+    -- Calculate the sum of all weights for the user's projects
+    SELECT SUM(p.weight) INTO total_weight
+    FROM corrections c
+    JOIN projects p ON c.project_id = p.id
+    WHERE c.user_id = user_id;
+    
+    -- Update the user's average_score with the weighted average
+    UPDATE users
+    SET average_score = IFNULL(total_weighted_score / total_weight, 0)
+    WHERE id = user_id;
+END //
 DELIMITER ;
