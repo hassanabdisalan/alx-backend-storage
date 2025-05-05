@@ -1,2 +1,2 @@
 // my comment
-db.adminCommand('listDatabases')
+db.admin('listDatabases')
