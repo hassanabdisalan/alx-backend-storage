@@ -1,4 +1,4 @@
 // 2-insert
-db.school.insertOne({
+db.school.insert({
   name: "ALX"
 })
