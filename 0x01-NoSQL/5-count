@@ -1,2 +1,2 @@
 // 5-count
-print(db.school.countDocuments());
+print(db.school.count());
