@@ -1,2 +1,2 @@
-// my comment
-db.admin('listDatabases')
+// Lists all MongoDB databases.
+show dbs;
