@@ -1,2 +1,2 @@
 // 7-delete
-db.school.delete({ name: "ALX School" });
+db.school.remove({ name: "ALX School" });
